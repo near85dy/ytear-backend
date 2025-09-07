@@ -4,6 +4,25 @@ import { admin, bearer, jwt, openAPI, username } from 'better-auth/plugins';
 import { db } from './db';
 
 export const auth = betterAuth({
+  user: {
+    additionalFields: {
+      username: {
+        type: 'string',
+        required: true,
+        input: true,
+      },
+      surname: {
+        type: 'string',
+        required: true,
+        input: true,
+      },
+      birthday: {
+        type: 'date',
+        required: true,
+        input: true,
+      },
+    },
+  },
   database: drizzleAdapter(db, {
     provider: 'pg',
   }),
