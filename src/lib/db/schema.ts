@@ -82,7 +82,7 @@ export const jwks = pgTable('jwks', {
   id: text('id').primaryKey(),
   publicKey: text('public_key').notNull(),
   privateKey: text('private_key').notNull(),
-  createdAt: timestamp('created_at').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const posts = pgTable('posts', {
@@ -93,7 +93,7 @@ export const posts = pgTable('posts', {
   userId: text('user_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
-  createdAt: timestamp('created_at').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const likes = pgTable('likes', {
@@ -105,7 +105,7 @@ export const likes = pgTable('likes', {
     .notNull()
     .references(() => posts.id, { onDelete: 'cascade' }),
 
-  createdAt: timestamp('created_at').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const comments = pgTable('comments', {
@@ -118,13 +118,15 @@ export const comments = pgTable('comments', {
     .notNull()
     .references(() => posts.id, { onDelete: 'cascade' }),
 
-  createdAt: timestamp('created_at').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const chats = pgTable('chats', {
   id: uuid('id').primaryKey().defaultRandom(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const messages = pgTable('messages', {
   id: uuid('id').primaryKey().defaultRandom(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
