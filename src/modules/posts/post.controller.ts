@@ -30,6 +30,13 @@ export class PostController {
     return await this.postService.getPostById(postId);
   }
 
+  @UseGuards(AuthGuard)
+  @Get('users/me/posts')
+  async getCurrentUserPosts(@Session() session: UserSession) {
+    const userId: string = session.user.id;
+    return await this.postService.getUserPosts(userId);
+  }
+
   @Get('users/:id/posts')
   async getUserPosts(@Param('id') userId: string) {
     return await this.postService.getUserPosts(userId);

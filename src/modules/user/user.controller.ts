@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Patch, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpException,
+  Param,
+  Patch,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard, Session, UserSession } from '@thallesp/nestjs-better-auth';
 import { UserService } from './user.service';
 
@@ -14,9 +22,9 @@ export class UserController {
 
   @Get(':id')
   async getUserById(@Param('id') id: string): Promise<Object> {
-    const user = (await this.userService.getUserById(id))[0];
+    const user = await this.userService.getUserById(id);
 
-    if (!user) return { message: 'User not found' };
+    if (!user) throw new HttpException('User not found', 404);
 
     return user;
   }
