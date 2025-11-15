@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { db } from 'src/lib/db';
-import { posts } from 'src/lib/db/schema';
+import { posts, user } from 'src/lib/db/schema';
 
 @Injectable({})
 export class PostService {
@@ -10,11 +10,14 @@ export class PostService {
   }
 
   async getUserPosts(userId: string) {
-    return await db.select().from(posts).where(eq(posts.userId, userId));
+    return await db.query.posts.findMany({
+      where: (posts, { eq }) => eq(posts.userId, userId),
+      with: {user: true}
+    })
   }
 
   async getPostById(id: string) {
-    return await db.select().from(posts).where(eq(posts.id, id));
+    return (await db.select().from(posts).where(eq(posts.id, id)));
   }
 
   async deletePost(userId: string, postId: string): Promise<Object> {
@@ -25,5 +28,10 @@ export class PostService {
     await db.delete(posts).where(eq(posts.id, postId));
 
     return { message: 'Post deleted', post };
+  }
+
+  async getRandomPosts(count: number)
+  {
+    return await db.query.posts.findMany({orderBy: sql`RANDOM()`, limit: count, with: {user: true}});
   }
 }

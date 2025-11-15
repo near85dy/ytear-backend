@@ -24,4 +24,9 @@ export class UserService {
       where: eq(user.id, id),
     })) as PublicUser | undefined;
   }
+
+  async updateUser(id: string, userData: {name?: string, surname?: string, image?: string, birthday?: string})
+  {
+    return await db.update(user).set(userData).where(eq(user.id, id))
+  }
 }

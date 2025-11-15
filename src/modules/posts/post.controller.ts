@@ -14,7 +14,13 @@ import { PostService } from './post.service';
 export class PostController {
   constructor(private postService: PostService) {}
 
-  @Post('posts')
+  @Get('posts/foryou')
+  async getPostsForyou()
+  {
+    return await this.postService.getRandomPosts(10);
+  }
+
+  @Post('users/me/posts')
   @UseGuards(AuthGuard)
   async createPost(
     @Session() session: UserSession,
@@ -51,4 +57,5 @@ export class PostController {
     const userId = session.user.id;
     return await this.postService.deletePost(userId, postId);
   }
+
 }

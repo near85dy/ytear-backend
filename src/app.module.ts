@@ -6,6 +6,7 @@ import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { auth } from './lib/auth';
 import { ConfigModule } from '@nestjs/config';
 import { PostModule } from './modules/posts/post.module';
+import { StorageModule } from './modules/storage/storate.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { PostModule } from './modules/posts/post.module';
     AuthModule.forRoot(auth),
     UserModule,
     PostModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

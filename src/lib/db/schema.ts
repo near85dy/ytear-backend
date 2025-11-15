@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm';
 import {
   pgTable,
   text,
@@ -130,3 +131,15 @@ export const messages = pgTable('messages', {
   id: uuid('id').primaryKey().defaultRandom(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+export const usersRelations = relations(user, ({ many }) => ({
+  posts: many(posts),
+}));
+
+export const postsRelations = relations(posts, ({ one }) => ({
+  user: one(user, {
+    fields: [posts.userId],
+    references: [user.id],
+  }),
+}));
+
