@@ -13,7 +13,7 @@ export class PostService {
     return await db.query.posts.findMany({
       where: (posts, { eq }) => eq(posts.userId, userId),
       with: {user: true}
-    })
+    }) 
   }
 
   async getPostById(id: string) {
@@ -32,6 +32,6 @@ export class PostService {
 
   async getRandomPosts(count: number)
   {
-    return await db.query.posts.findMany({orderBy: sql`RANDOM()`, limit: count, with: {user: true}});
+    return await db.query.posts.findMany({limit: 1000, with: {user: true}});
   }
 }

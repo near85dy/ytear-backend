@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { User } from 'better-auth/*';
-import { eq } from 'drizzle-orm';
+import { eq, ilike } from 'drizzle-orm';
 import { db } from 'src/lib/db';
 import { user } from 'src/lib/db/schema';
 
-interface PublicUser {
+export interface PublicUser {
   id: string;
   username: string;
   name: string;
@@ -20,13 +19,40 @@ export class UserService {
         username: true,
         name: true,
         surname: true,
+        image: true,
+        birthday: true,
       },
       where: eq(user.id, id),
     })) as PublicUser | undefined;
   }
 
-  async updateUser(id: string, userData: {name?: string, surname?: string, image?: string, birthday?: string})
+  filterAllowedFields(data: Record<string, any>, allowed: string[]) {
+    return Object.fromEntries(
+      Object.entries(data).filter(([key]) => allowed.includes(key) && data[key] !== undefined)
+    );
+  }
+
+  async updateUser(id: string, userData: {name?: string, surname?: string, image?: string})
   {
-    return await db.update(user).set(userData).where(eq(user.id, id))
+    const result = await db
+      .update(user)
+      .set(userData)
+      .where(eq(user.id, id))
+      .returning();
+
+    return result[0];
+  }
+
+  async getUserByUsername(username: string)
+  {
+    return (await db.query.user.findMany({columns: {
+        id: true,
+        username: true,
+        name: true,
+        surname: true,
+        image: true,
+        birthday: true,
+      },
+      where: ilike(user.username, `${username}%`), limit: 10})) as PublicUser[] | undefined;
   }
 }

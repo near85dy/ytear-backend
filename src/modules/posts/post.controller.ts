@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
   Param,
   Post,
   UseGuards,
@@ -17,7 +18,7 @@ export class PostController {
   @Get('posts/foryou')
   async getPostsForyou()
   {
-    return await this.postService.getRandomPosts(10);
+    return await this.postService.getRandomPosts(30);
   }
 
   @Post('users/me/posts')
@@ -27,6 +28,7 @@ export class PostController {
     @Body() body: { content: string },
   ) {
     const userId = session.user.id;
+    if(body.content.length > 256) throw new HttpException("Message to long", 400);
     const post = (await this.postService.post(userId, body.content))[0];
     return post;
   }

@@ -32,4 +32,5 @@ export const auth = betterAuth({
   }),
   plugins: [admin(), bearer(), jwt(), username(), openAPI()],
   emailAndPassword: { enabled: true },
+  trustedOrigins: ["http://77.93.9.99", "http://localhost:5173"]
 });

@@ -6,9 +6,6 @@ import * as multer from 'multer';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Response } from "express";
-import { db } from "src/lib/db";
-import { user } from "src/lib/db/schema";
-import { eq } from "drizzle-orm";
 import { UserService } from "../user/user.service";
 
 const AVATAR_DIR = "storage/avatars"
@@ -33,12 +30,19 @@ export class StorageController {
         const uuid = uuidv7(); 
         const filePath = path.join(uploadDir, uuid);
         
+        if(session.user.image && session.user.image != "main")
+        {
+            await fs.unlink(path.join(uploadDir, session.user.image), (err) => {
+                console.log(err)
+            })
+        }
+
         fs.promises.writeFile(filePath, file.buffer);
 
         const response = await this.userService.updateUser(session.user.id, {image: uuid})
 
         console.log(response);
-        
+
         return { message: "File saved!", id: uuid };
     }
 }

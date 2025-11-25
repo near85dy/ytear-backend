@@ -1,3 +1,4 @@
+import { array } from 'better-auth/*';
 import { relations } from 'drizzle-orm';
 import {
   pgTable,
@@ -8,7 +9,10 @@ import {
   numeric,
   integer,
   date,
+  pgEnum,
 } from 'drizzle-orm/pg-core';
+
+export const notificationTypesEnum = pgEnum("notification_type", ["system", "ping", "message"])
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -17,7 +21,7 @@ export const user = pgTable('user', {
   birthday: date('birthday').notNull(),
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').default(false).notNull(),
-  image: text('image'),
+  image: text('image').default('main'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
@@ -122,24 +126,49 @@ export const comments = pgTable('comments', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-export const chats = pgTable('chats', {
+export const notifications = pgTable(`notifications`, {
   id: uuid('id').primaryKey().defaultRandom(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  content: text("content"),
+  type: notificationTypesEnum("notification_type").notNull().default("system"),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
+export const chat = pgTable('chats', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  user1: text("user1_id").notNull().references(() => user.id, { onDelete: 'cascade' }),
+  user2: text('user2_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-export const messages = pgTable('messages', {
+export const message = pgTable('messages', {
   id: uuid('id').primaryKey().defaultRandom(),
+  userId: text("user_id").notNull().references(() => user.id, { onDelete: 'cascade' }),
+  chatId: uuid("chat_id").notNull().references(() => chat.id, { onDelete: 'cascade' }),
+  content: text('content').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const usersRelations = relations(user, ({ many }) => ({
   posts: many(posts),
+  chats: many(chat)
 }));
+
+export const chatRelations = relations(chat, ({one, many}) => ({
+  user1: one(user, {fields: [chat.user1], references: [user.id]}),
+  user2: one(user, {fields: [chat.user2], references: [user.id]}),
+  messages: many(message),
+}))
+
+export const messageRelations = relations(message, ({one}) => ({
+  chat: one(chat, {fields: [message.chatId], references: [chat.id]})
+}))
 
 export const postsRelations = relations(posts, ({ one }) => ({
   user: one(user, {
-    fields: [posts.userId],
+    fields: [posts.userId], 
     references: [user.id],
   }),
 }));
-

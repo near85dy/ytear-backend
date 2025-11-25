@@ -7,6 +7,7 @@ import { auth } from './lib/auth';
 import { ConfigModule } from '@nestjs/config';
 import { PostModule } from './modules/posts/post.module';
 import { StorageModule } from './modules/storage/storate.module';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { StorageModule } from './modules/storage/storate.module';
     AuthModule.forRoot(auth),
     UserModule,
     PostModule,
+    ChatModule,
     StorageModule,
   ],
   controllers: [AppController],
